@@ -1,21 +1,21 @@
-# DeepLinkingToNativeApp
+# Browser DeepLinking to Native App
 Javascript to DeepLink to Native App.
 
 
-Based on the Popular Browsers, I have compiled down different deeplinking implementation as following:
+Based on the modern mobile browsers, I have compiled down different deeplinking implementation as following:
 
 ##### DirectAppLaunchStrategy
-> This is the most common deeplinking strategy/implementation where browser tries to open app using *Iframe* or 
-*window.location*, and then to app store after few seconds as soon as window is loaded. Most of the browsers still support this. 
+> This is the most common deeplinking strategy/implementation where browser tries to open app using `Iframe` or 
+`window.location`, and then to app store after few seconds as soon as window is loaded. Most of the browsers still support this. 
 
 ##### DirectAppOnlyLaunchStrategy
-> This is same as **DirectAppLaunchStrategy**, but it only tries to open app, not app store. Twitter browser on iOS8, 
-opens 'open url' dialog box and also redirects to app store without waiting for 'open url' dialog box to get dismissed.
+> This is same as `DirectAppLaunchStrategy`, but it only tries to open app, not app store. Twitter browser on iOS8, 
+opens 'Open URL..' dialog box and also redirects to app store without waiting for 'Open Url' dialog box to get dismissed.
 This is only used for iOS8 Twitter Browser.
 
 ##### CTAAppLaunchStrategy (Call to Action)
-> This requires user action to redirect to app or app store. Landing page needs to have element with 'id' attribute. 
-Essentially it is same as **DirectAppOnlyLaunchStrategy**, but this requires user action/click.
+> This requires user action to redirect to app or app store. Landing page needs to have element with `id` attribute. 
+Essentially it is same as `DirectAppOnlyLaunchStrategy`, but this requires user action/click.
 
 ##### UniversalLinkAppLaunchStrategy (Introduced on iOS9).
 > This is new deep linking technique introduced on IOS9. Same http url is used to open app or in browser.
@@ -31,17 +31,17 @@ For this to work:
     
 This technique will just change the url of 'Open In App' button, to the url that does universal linking.
 
-> To test if, universal linking is working for IosApp, tap the universal link from message app on Ios.
-If it does not open the app, then it means universal link is not configured properly.* 
+> To test if, universal linking is working for iOS App, tap the universal link from message app on Ios.
+If it does not open the app, then it means universal link is not configured properly. 
 
 > **Important:** This is only being used on iOS9 Facebook browser. For this to work, landing page which is used for 
   deeplinking should be cross domain. Otherwise it won't work. To get it working with Facebook and iOS9 directly, Facebook 
-  **applink** method can also be used, but it also requires some implementation on the App side.  
+  `applink` method can also be used, but it also requires some implementation on the App side.  
  
  
 ##### NotSupportedAppLaunchStrategy.
 > This implementation displays browser dialog box with message provided in settings. Some of the browsers in Android
-Device does not understand *Intent* or Custom URI Scheme.  
+Device does not understand `Intent` or Custom URI Scheme `myapp://`.  
  
 
 
@@ -54,7 +54,7 @@ Device does not understand *Intent* or Custom URI Scheme.
 ## Android
 | OS/Browser     	| Facebook             	| Twitter              	| Chrome               	| Safari               	| Stock                         	| Native                        	|
 |----------------	|----------------------	|----------------------	|----------------------	|----------------------	|-------------------------------	|-------------------------------	|
-| Version <= 4.3 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| NotSupportedAppLaunchStrategy 	| NotSupportedAppLaunchStrategy 	|
+| Version >= 4.3 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| NotSupportedAppLaunchStrategy 	| NotSupportedAppLaunchStrategy 	|
 
 ##### I have not tested it on < Android 4.3. But if it needs to be supported, create an issue or send a pull request.
 
