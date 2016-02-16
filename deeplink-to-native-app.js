@@ -154,19 +154,22 @@ var NativeAppLauncher = (function($) {
             // If user navigates back to browser and clicks the button,
             // try redirecting again.
             el.unbind('click').on('click', function() {
-                //redirect();
+                redirect();
             });
         };
 
         var redirect = function () {
-            /**
+            window.location = strategyParameters.getAppUri();
+
             timeout = setTimeout(function() {
                 window.top.location = strategyParameters.getAppStoreURI();
-            }, 1000);
-            window.location = strategyParameters.getAppUri(); **/
+            }, 1500);
 
-            // Iframe solution does not generate the 'invalid url' dialog box for the 
-            // first time in Safari, which is better than window.location solution.
+            $(window).bind(events.join(" "), preventDialog);
+
+            // Iframe solution does not generate the 'invalid url' pop on
+            // Safari.
+            /**
             var iFrame = document.createElement('iframe');
             iFrame.style.border = "none";
             iFrame.style.width = "1px";
@@ -183,8 +186,7 @@ var NativeAppLauncher = (function($) {
             timeout = setTimeout(function() {
                 window.location = strategyParameters.getAppStoreURI();
             }, 1000);
-            
-            $(window).bind(events.join(" "), preventDialog);
+             */
         }
     };
 
@@ -204,10 +206,17 @@ var NativeAppLauncher = (function($) {
             var el = strategyParameters.getAppLauncherEl();
             //el.attr('href', strategyParameters.getAppUri());
             var id = el.attr('id');
+            /**
             $("body").on('click',  '#' + id, function(e) {
                 e.preventDefault();
                 directStrategy.init();
             })
+            **/
+            
+            // As only Android is using this strategy. Otherwise this requires to be
+            // modified as this does not redirect to app store if App is not installed 
+            // on iOS.
+            el.attr('href', strategyParameters.getAppUri());
         }
     };
 
@@ -253,53 +262,62 @@ var NativeAppLauncher = (function($) {
      * @param strategyParameters
      * @constructor
      */
-    var UniversalLinkingAppLaunchStrategy = function(strategyParameters) {
+     var UniversalLinkingAppLaunchStrategy = function(strategyParameters) {
         AppLaunchStrategy.call(this, strategyParameters);
+
         this.init = function() {
+
             if (!strategyParameters.getUniversalLinkingUrl()) {
                 throw new Error('Universal Linking: Invalid url provided: ' + strategyParameters.getUniversalLinkingUrl());
             }
             var el = strategyParameters.getAppLauncherEl();
 
-            var $cookieName = 'ul-' + document.referrer;
+            var $cookieName = 'go90-ul-flag';
 
-            var $location;
-            $location = strategyParameters.getUniversalLinkingUrl();
-            var $cookieValue = readCookie($cookieName);
-            // Do not set cookie on page refresh.
-            // Its to check that user does not have app installed, as universal link will reload page
-            // if app is not installed.
-            if (document.referrer.indexOf(location.protocol + "//" + location.host) === -1) {
-                // Set cookies for 3 minutes only.
-                if (!$cookieValue) {
-                    createCookie($cookieName, 1, 0.00208333);
-                }
-                createCookie($cookieName, parseInt($cookieValue) + 1, 0.00208333);
-            }
-            
-            if($cookieValue > 1) {
-                // App uri is saved in variable, if user navigates back from app store to browser, the
-                // click on the button should again take to the app store.
+            var $location = strategyParameters.getUniversalLinkingUrl();
+
+            if (appNotInstalled()) {
                 $location = strategyParameters.getAppStoreURI();
-                window.location = strategyParameters.getAppStoreURI();
-            }
-
-            el.click(function() {
                 window.location = $location;
+            }
+            el.attr('href', $location);
+
+            // This is only invoked when page is refreshed, not clicked on the 'watch in button'.
+            // Pretend, if user is coming to landing page first the first time.
+            // This is not invoked when page is navigating away if 'href' is clicked.
+            $(window).unload(function() {
+                eraseCookie($cookieName);
             });
 
+            setCookie();
+            el.click(function() {
+                setCookie();
+            });
+
+            // If cookie value is greater than 1, that means user does not have app installed.
+            function appNotInstalled() {
+                return readCookie($cookieName) > 1;
+            }
+
+            function setCookie() {
+                var $cookieValue = readCookie($cookieName);
+                if (!$cookieValue || isNaN($cookieValue)) {
+                    // set for 3 min.
+                    createCookie($cookieName, 1, 0.0034)
+                } else {
+                    // set for 3 min.
+                    createCookie($cookieName, 2, 0.0034);
+                }
+            }
         };
+
         function createCookie(name, value, days) {
-            var expires;
             if (days) {
                 var date = new Date();
                 date.setTime(date.getTime()+(days*24*60*60*1000));
-                expires = "; expires=" + date.toGMTString();
+                var expires = "; expires=" + date.toGMTString();
             }
-            else {
-                expires = "";
-            }
-
+            else var expires = "";
             document.cookie = name +"=" + value + expires +"; path=/";
         }
 
@@ -315,7 +333,7 @@ var NativeAppLauncher = (function($) {
         }
 
         function eraseCookie(name) {
-            createCookie(name, "", -1);
+            createCookie(name,"",-1);
         }
     };
 
