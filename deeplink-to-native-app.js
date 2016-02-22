@@ -4,7 +4,10 @@
  *  Prabeen Giri.
  *
  * @return object
- *  Global object as NativeAppLauncher.
+ *  Javascript object with 'init' method to initialize
+ *  NativeAppLauncher
+ *
+ *
  */
 var NativeAppLauncher = (function($) {
 
@@ -22,9 +25,6 @@ var NativeAppLauncher = (function($) {
     var AppLaunchStrategyParameters =  {
         // On desktop, we don't know what to do.
         getAppUri : function() {
-            if (!Settings.appUri) {
-                throw new Error('Settings does not have valid appUri.');
-            }
             return "#";
         },
         getAppLauncherEl : function() {
@@ -57,11 +57,11 @@ var NativeAppLauncher = (function($) {
      * Android App Launch Strategies.
      */
     var AndroidAppLaunchStrategyParameters = $.extend({}, AppLaunchStrategyParameters, {
-        getAppUri: function () {
-            if (!Settings.androidAppId) {
-                throw new Error('Settings does not have valid androidAppId');
-            }
+        getIntentURI: function() {
             return "intent://m/#Intent;scheme=" + Settings.appUri + ";package="+ Settings.androidAppId +";end";
+        },
+        getAppUri: function () {
+            return Settings.appUri;
         },
         getAppStoreURI: function () {
             var campaignString = this.getCampaignValue() ? "&referrer=utm_source%3Dother%26utm_campaign%3D" + this.getCampaignValue() : "";
@@ -79,9 +79,6 @@ var NativeAppLauncher = (function($) {
                 Utils.appendQueryParameter(Settings.iOsAppStore, 'ct', this.getCampaignValue()) : Settings.iOsAppStore;
         },
         getUniversalLinkingUrl : function() {
-            if (!Settings.androidAppId) {
-                throw new Error('Settings does not have valid universalLinkURL');
-            }
             return Settings.universalLinkUrl;
         },
         getAppUri : function() {
@@ -105,10 +102,11 @@ var NativeAppLauncher = (function($) {
 
     /**
      * This just tries to redirect to app, not to the app store, as
-     * Twitter iOS8 browser does open both app and app store which is not
+     * twitter io8 browser does open both app and app store which is not
      * a good user experience. If user does not have app installed, they will just
      * they will have to click to download app button manually to go to app store.
      *
+     * Eg, Quora does the same.
      */
     var DirectAppOnlyLaunchStrategy = function(strategyParameters) {
         this.init = function () {
@@ -146,47 +144,22 @@ var NativeAppLauncher = (function($) {
         var self = this;
 
         this.init = function() {
-            // Even after Redirect we want to have CTA work if user navigates back and clicks the
-            // 'Watch In App' button.
-            el.attr('href', strategyParameters.getAppUri());
             redirect();
-
             // If user navigates back to browser and clicks the button,
             // try redirecting again.
-            el.unbind('click').on('click', function() {
+            el.unbind('click').on('click', function(e) {
+                e.preventDefault();
                 redirect();
             });
         };
 
         var redirect = function () {
             window.location = strategyParameters.getAppUri();
+            $(window).bind(events.join(" "), preventDialog);
 
             timeout = setTimeout(function() {
                 window.top.location = strategyParameters.getAppStoreURI();
             }, 1500);
-
-            $(window).bind(events.join(" "), preventDialog);
-
-            // Iframe solution does not generate the 'invalid url' pop on
-            // Safari.
-            /**
-            var iFrame = document.createElement('iframe');
-            iFrame.style.border = "none";
-            iFrame.style.width = "1px";
-            iFrame.style.height = "1px";
-            iFrame.onload = function () {
-                document.location = strategyParameters.getAppUri();
-            };
-            iFrame.src = strategyParameters.getAppUri(); //iOS app schema url
-
-            window.onload = function(){
-                document.body.appendChild(iFrame);
-            };
-
-            timeout = setTimeout(function() {
-                window.location = strategyParameters.getAppStoreURI();
-            }, 1000);
-             */
         }
     };
 
@@ -204,19 +177,29 @@ var NativeAppLauncher = (function($) {
         this.init = function() {
             var directStrategy = new DirectAppLaunchStrategy(strategyParameters);
             var el = strategyParameters.getAppLauncherEl();
-            //el.attr('href', strategyParameters.getAppUri());
             var id = el.attr('id');
-            /**
             $("body").on('click',  '#' + id, function(e) {
                 e.preventDefault();
                 directStrategy.init();
-            })
-            **/
-            
-            // As only Android is using this strategy. Otherwise this requires to be
-            // modified as this does not redirect to app store if App is not installed 
-            // on iOS.
-            el.attr('href', strategyParameters.getAppUri());
+            });
+        }
+    };
+
+    /**
+     * This is only used for android devices as, they understand the "Intent" URI
+     * which automatically resolves the app installation state and redirects users accordingly.
+     * With This strategy, we cannot pass the campaign id, if user is being redirect to app store.
+
+     * @param strategyParameters
+     * @constructor
+     */
+    var CTAIntentAppLaunchStrategy = function(strategyParameters) {
+        AppLaunchStrategy.call(this, strategyParameters);
+
+        this.init = function() {
+            var el = strategyParameters.getAppLauncherEl();
+            var id = el.attr('id');
+            el.attr('href', strategyParameters.getIntentURI());
         }
     };
 
@@ -252,7 +235,7 @@ var NativeAppLauncher = (function($) {
      * While app is installing it invokes the Universal like present on the domain specified and registers those path
      * for universal linking.
      *
-     * This technique will just change the url of 'Open App' button, to the url that does universal linking.
+     * This technique will just change the url of 'Watch In App' button, to the url that does universal linking.
      *
      * To test if, universal linking is working for IosApp, tap the universal link from message app on Ios.
      * If it does not open the app, then it means universal link is not configured properly.
@@ -262,13 +245,13 @@ var NativeAppLauncher = (function($) {
      * @param strategyParameters
      * @constructor
      */
-     var UniversalLinkingAppLaunchStrategy = function(strategyParameters) {
+    var UniversalLinkingAppLaunchStrategy = function(strategyParameters) {
         AppLaunchStrategy.call(this, strategyParameters);
 
         this.init = function() {
-
             if (!strategyParameters.getUniversalLinkingUrl()) {
-                throw new Error('Universal Linking: Invalid url provided: ' + strategyParameters.getUniversalLinkingUrl());
+                //throw new Error('Universal Linking: Invalid url provided: ' + strategyParameters.getUniversalLinkingUrl());
+                console.log("Error: Universal Linking: Invalid url provided: " + strategyParameters.getUniversalLinkingUrl());
             }
             var el = strategyParameters.getAppLauncherEl();
 
@@ -277,15 +260,13 @@ var NativeAppLauncher = (function($) {
             var $location = strategyParameters.getUniversalLinkingUrl();
 
             if (appNotInstalled()) {
-                $location = strategyParameters.getAppStoreURI();
-                window.location = $location;
+                window.location = strategyParameters.getAppStoreURI();
+                eraseCookie();
             }
             el.attr('href', $location);
 
-            // This is only invoked when page is refreshed, not clicked on the 'watch in button'.
-            // Pretend, if user is coming to landing page first the first time.
-            // This is not invoked when page is navigating away if 'href' is clicked.
-            $(window).unload(function() {
+            // If user navigates away/closes Fb Browser.
+            $(window).on('blur', function() {
                 eraseCookie($cookieName);
             });
 
@@ -299,26 +280,28 @@ var NativeAppLauncher = (function($) {
                 return readCookie($cookieName) > 1;
             }
 
+            // On blur will always clear the cookie, or when trying to
+            // navigate to the app store, however, if user closes the fb directly,
+            // then it assumes for 1 min that user does not have app installed if
+            // app is not detected earlier and installed. If that happens within 1min
+            // if user directly closes the fb, which means cookie still resides.
             function setCookie() {
                 var $cookieValue = readCookie($cookieName);
                 if (!$cookieValue || isNaN($cookieValue)) {
-                    // set for 3 min.
-                    createCookie($cookieName, 1, 0.0034)
+                    // set for 1 min.
+                    createCookie($cookieName, 1, 60)
                 } else {
-                    // set for 3 min.
-                    createCookie($cookieName, 2, 0.0034);
+                    // set for 1 min.
+                    createCookie($cookieName, 2, 60);
                 }
             }
         };
 
-        function createCookie(name, value, days) {
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime()+(days*24*60*60*1000));
-                var expires = "; expires=" + date.toGMTString();
-            }
-            else var expires = "";
-            document.cookie = name +"=" + value + expires +"; path=/";
+        function createCookie(name, value, second) {
+            var date = new Date();
+            date.setTime(date.getTime()+(second * 1000));
+            var expires = "; expires="+date.toGMTString();
+            document.cookie = name+"="+value+expires+"; path=/";
         }
 
         function readCookie(name) {
@@ -340,7 +323,7 @@ var NativeAppLauncher = (function($) {
     /**
      *  Creates the Strategy Parameter object required for the Strategy
      *  based on the type of the OS.
-     *  
+     *
      *  @return AppLaunchStrategyParameters Object
      */
     var AppLaunchStrategyParameterFactory = function() {
@@ -381,13 +364,16 @@ var NativeAppLauncher = (function($) {
         } else if(strategyType == 'direct') {
             appLaunchStrategy = new DirectAppLaunchStrategy(strategyParameters);
         } else if (strategyType == 'ul') {
+
             appLaunchStrategy =  new UniversalLinkingAppLaunchStrategy(strategyParameters);
         } else if (strategyType == 'notsupported') {
             appLaunchStrategy =  new AppLaunchNotSupportedStrategy(strategyParameters);
         } else if (strategyType == 'directapponly') {
             appLaunchStrategy =  new DirectAppOnlyLaunchStrategy(strategyParameters);
+        } else if (strategyType == 'intent_cta') {
+            appLaunchStrategy =  new CTAIntentAppLaunchStrategy(strategyParameters);
         } else {
-            throw new Error('Deeplinking: Unsupported device type');
+            throw new Error('Deeplinking: Unsupported deeplinking strategy type');
         }
 
         if (Settings.debug && appLaunchStrategy) {
@@ -428,10 +414,10 @@ var NativeAppLauncher = (function($) {
 
         var isAndroid = function () {
             /**
-            // This is to check Android Mobile.
-            return userAgent.indexOf('android') > -1
-                && userAgent.indexOf('Mozilla/5.0') > -1
-                && userAgent.indexOf('AppleWebKit') > -1;
+             // This is to check Android Mobile.
+             return userAgent.indexOf('android') > -1
+             && userAgent.indexOf('Mozilla/5.0') > -1
+             && userAgent.indexOf('AppleWebKit') > -1;
              */
             return userAgent.indexOf('android') > -1;
         };
@@ -523,8 +509,7 @@ var NativeAppLauncher = (function($) {
             }
         }
         else if (browser.isAndroid) {
-            deepLinkingStrategy = new AppLaunchStrategyFactory('cta');
-
+            deepLinkingStrategy = new AppLaunchStrategyFactory('intent_cta');
             if (browser.isAndroidNativeBrowser || browser.isAndroidStockBrowser) {
                 deepLinkingStrategy = new AppLaunchStrategyFactory('notsupported');
             }
@@ -547,7 +532,11 @@ var NativeAppLauncher = (function($) {
      */
     var Init = function (settings) {
         Settings = settings;
-        return AppLauncherFactory().init();
+        // Let all the page render finish.
+        setTimeout(function() {
+            return AppLauncherFactory().init();
+        }, 1000);
+
     };
 
     /**
@@ -574,6 +563,7 @@ var NativeAppLauncher = (function($) {
             if (queryString == undefined) {
                 queryString = window.location.search;
             }
+
             queryString = queryString.split('+').join(' ');
             var params = {}, tokens,
                 re = /[?&]?([^=]+)=([^&]*)/g;
