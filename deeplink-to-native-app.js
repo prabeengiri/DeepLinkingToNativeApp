@@ -6,8 +6,6 @@
  * @return object
  *  Javascript object with 'init' method to initialize
  *  NativeAppLauncher
- *
- *
  */
 var NativeAppLauncher = (function($) {
 
@@ -16,7 +14,7 @@ var NativeAppLauncher = (function($) {
     /**
      * This is Base StrategyParameter
      *
-     * This object is acts as a Adapter pattern and created to achieve
+     * This object acts as an Adapter which is created to achieve
      * parameterized Strategy Pattern.
      * This is implemented, so that AppLaunchStrategies can share same interface
      * as they accepts different arguments to run. So strategies don't have to worry about the
