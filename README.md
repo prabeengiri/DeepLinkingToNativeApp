@@ -1,5 +1,5 @@
 # Browser DeepLinking to Native App
-Javascript to DeepLink to Native App.
+JavaScript to DeepLink to Native App.
 
 
 Based on the modern mobile browsers, I have compiled down different deeplinking implementation as following:
