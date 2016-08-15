@@ -135,7 +135,7 @@ var NativeAppLauncher = (function($) {
         var preventDialog = function () {
             clearTimeout(timeout);
             timeout = null;
-            $(window).unbind(events.join(""));
+            $(window).unbind(events.join(" "));
         };
 
         var el = strategyParameters.getAppLauncherEl();
