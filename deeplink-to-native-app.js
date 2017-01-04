@@ -253,7 +253,7 @@ var NativeAppLauncher = (function($) {
             }
             var el = strategyParameters.getAppLauncherEl();
 
-            var $cookieName = 'go90-ul-flag';
+            var $cookieName = 'ul-app-detection-flag';
 
             var $location = strategyParameters.getUniversalLinkingUrl();
 
