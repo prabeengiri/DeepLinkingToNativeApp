@@ -215,7 +215,10 @@ var NativeAppLauncher = (function($) {
             var id = strategyParameters.getAppLauncherEl().attr('id');
             $("body").on('click',  '#' + id, function(e) {
                 e.preventDefault();
-                alert(strategyParameters.getNotSupportedMessage());
+                if (strategyParameters.getNotSupportedMessage()) {
+                    alert(strategyParameters.getNotSupportedMessage());
+                }
+
             })
         }
     };
