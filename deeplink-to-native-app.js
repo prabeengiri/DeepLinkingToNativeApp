@@ -215,10 +215,9 @@ var NativeAppLauncher = (function($) {
             var id = strategyParameters.getAppLauncherEl().attr('id');
             $("body").on('click',  '#' + id, function(e) {
                 e.preventDefault();
-                if (strategyParameters.getNotSupportedMessage()) {
-                    alert(strategyParameters.getNotSupportedMessage());
-                }
-
+                var message = strategyParameters.getNotSupportedMessage() ?
+                  strategyParameters.getNotSupportedMessage() : 'Not Supported';
+                alert(message);
             })
         }
     };

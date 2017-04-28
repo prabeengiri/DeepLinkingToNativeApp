@@ -68,7 +68,7 @@ Device does not understand `Intent` or Custom URI Scheme `myapp://`.
 $(document).ready(function() {
     NativeAppLauncher.init({
       appLauncherElId: 'open-app-link', // Element Id of App Launcher button. 
-      notSupportedMessage: 'Sorry, you’ll need to use a different browser to do this.',
+      notSupportedMessage: 'Sorry, you’ll need to use a different browser to do this.', // Defaults to 'Not Supported!'
       universalLinkUrl: 'http://mysite.com',
       appUri: 'myapp://',
       androidAppId: 'com.mycompany.app.enterprise',
