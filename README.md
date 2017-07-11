@@ -45,36 +45,36 @@ Device does not understand `Intent` or Custom URI Scheme `myapp://`.
  
 
 
-## IOS
+### iOS
 | OS/Browser   	| Facebook                       	| Twitter                 	| Chrome                  	| Safari                  	|
 |--------------	|--------------------------------	|-------------------------	|-------------------------	|-------------------------	|
 | Version <= 8 	| DirectAppLaunchStrategy        	| DirectAppLaunchStrategy 	| DirectAppLaunchStrategy 	| DirectAppLaunchStrategy 	|
 | Version >= 9 	| UniversalLinkAppLaunchStrategy 	| DirectAppLaunchStrategy 	| DirectAppLaunchStrategy 	| DirectAppLaunchStrategy 	|
 
-## Android
+### Android
 | OS/Browser     	| Facebook             	| Twitter              	| Chrome               	| Safari               	| Stock                         	| Native                        	|
 |----------------	|----------------------	|----------------------	|----------------------	|----------------------	|-------------------------------	|-------------------------------	|
 | Version >= 4.3 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| CTAAppLaunchStrategy 	| NotSupportedAppLaunchStrategy 	| NotSupportedAppLaunchStrategy 	|
 
 ##### I have not tested it on < Android 4.3. But if it needs to be supported, create an issue or send a pull request.
 
-## Desktop
+### Desktop
 **Does Nothing!!!**
 
 
 
-###Usage (Requires Jquery)
-```
+## Usage (Requires Jquery)
+```JS
 $(document).ready(function() {
     NativeAppLauncher.init({
-      appLauncherElId: 'open-app-link', // Element Id of App Launcher button. 
-      notSupportedMessage: 'Sorry, you’ll need to use a different browser to do this.', // Defaults to 'Not Supported!'
-      universalLinkUrl: 'http://mysite.com',
-      appUri: 'myapp://',
-      androidAppId: 'com.mycompany.app.enterprise',
-      iOsAppStore:'https://itunes.apple.com/app/apple-store/id234234234?pt=12121212&mt=8',
-      debug:false, // Optional
-      campaignCode: 'this-is-test-campaign' // optional, this appends campaign on app store url.
+        appLauncherElId: 'open-app-link', // Element Id of App Launcher button. 
+        notSupportedMessage: 'Sorry, you’ll need to use a different browser to do this.', // Defaults to 'Not Supported!'
+        universalLinkUrl: 'http://mysite.com',
+        appUri: 'myapp://',
+        androidAppId: 'com.mycompany.app.enterprise',
+        iOsAppStore: 'https://itunes.apple.com/app/apple-store/id234234234?pt=12121212&mt=8',
+        debug: false, // Optional
+        campaignCode: 'this-is-test-campaign' // optional, this appends campaign on app store url.
     });
 });
 ```
