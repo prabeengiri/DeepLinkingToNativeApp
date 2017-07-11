@@ -389,7 +389,7 @@ var NativeAppLauncher = (function($) {
     var BrowserChecker = function() {
         var userAgent = window.navigator.userAgent.toLowerCase();
         var iOSVersion = function() {
-            return isIOS() ? parseInt(userAgent.match(/os\s+(\d)_/)[1], 10) : false;
+            return isIOS() ? parseInt(userAgent.match(/os\s+(\d+)_/)[1], 10) : false;
         };
         var isIOS = function() {
             return /(?:i(?:phone|p(?:o|a)d))/.test(userAgent);
