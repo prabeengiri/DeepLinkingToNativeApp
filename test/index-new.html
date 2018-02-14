@@ -1,0 +1,89 @@
+<html>
+  <head>
+      <meta id="viewport" name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+
+    <title>Test: Deep Link to Native App Launch</title>
+      <style>
+          body {
+            font-family: "San Francisco", "Helvetica Neue", "Lucida Grande";
+              color:black;
+          }
+          div {
+              text-align: center;
+          }
+          .download-app{
+              color:#999;
+              font-size:15px;
+          }
+          .download-app a {
+              color:rebeccapurple;
+              font-weight:bold;
+          }
+          .centered {
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              margin-top: -180px;
+              margin-left: -145px;
+          }
+          .open-app {
+              margin: 0 0 25px;
+              overflow: hidden;
+              padding: 12px;
+              background-color: #eeeeee;
+              border: 1px solid rebeccapurple;
+              -webkit-border-radius: 5px;
+              border-radius: 5px;
+              font-size: 20px;
+              font-weight: bold;
+              color:rebeccapurple;
+              text-decoration: none;
+          }
+
+          .app-logo {
+              background-color:rebeccapurple;
+              margin-bottom:50px;
+              color: white;
+              padding:30px;
+              border-radius: 8px;
+              font-size:35px;
+          }
+      </style>
+  </head>
+  <body>
+      <div class="centered">
+          <div>
+            <span class="app-logo">My App</span>
+          </div>
+          <br>
+          <br>
+          <br>
+          <br>
+
+          <div><a id="open-app-link" class="open-app" href="javascript:;"> Open App</a></div>
+          <br>
+          <br>
+          <div class="download-app">
+            If you don't have app installed,
+            <br>
+              please
+             <a href="https://itunes.apple.com/us/app/facebook/id284882215?mt=8">download</a>
+              it at App store.
+          </div>
+          <em>This uses Linkedin app store details for testing.</em>
+      </div>
+      <script src="../dist/deeplinkToNativeApp-from-typescript.js"></script>
+      <script>
+                new deeplinkToNativeApp.NativeAppLauncher().init({
+                    appLauncherElId: 'open-app-link', // Element Id of App Launcher button.
+                    notSupportedMessage: 'Sorry, you’ll need to use a different browser to do this.',
+                    universalLinkUrl: 'http://linkedin.com',
+                    appUri: 'linkedin://',
+                    androidAppId: 'com.linkedin.android',
+                    iOsAppStore:'https://itunes.apple.com/us/app/linkedin/id288429040?mt=8',
+                    debug:false // Optional
+                    //campaignCode: 'this-is-test-campaign' // optional, this appends campaign on app store url.
+                });
+      </script>
+  </body>
+</html>
