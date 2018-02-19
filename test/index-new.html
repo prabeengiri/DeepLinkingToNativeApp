@@ -60,7 +60,7 @@
           <br>
           <br>
 
-          <div><a id="open-app-link" class="open-app" href="javascript:;"> Open App</a></div>
+          <div><a id="open-app-link" class="open-app" href="javascript:;"> Open App - New Test</a></div>
           <br>
           <br>
           <div class="download-app">
@@ -74,16 +74,18 @@
       </div>
       <script src="../dist/deeplinkToNativeApp-from-typescript.js"></script>
       <script>
-                new deeplinkToNativeApp.NativeAppLauncher().init({
-                    appLauncherElId: 'open-app-link', // Element Id of App Launcher button.
-                    notSupportedMessage: 'Sorry, you’ll need to use a different browser to do this.',
-                    universalLinkUrl: 'http://linkedin.com',
-                    appUri: 'linkedin://',
-                    androidAppId: 'com.linkedin.android',
-                    iOsAppStore:'https://itunes.apple.com/us/app/linkedin/id288429040?mt=8',
-                    debug:false // Optional
-                    //campaignCode: 'this-is-test-campaign' // optional, this appends campaign on app store url.
-                });
+                setTimeout(function() { // TODO: set timeout simulates domready
+                    new deeplinkToNativeApp.NativeAppLauncher().init({
+                        appLauncherElId: 'open-app-link', // Element Id of App Launcher button.
+                        notSupportedMessage: 'Sorry, you’ll need to use a different browser to do this.',
+                        universalLinkUrl: 'http://linkedin.com',
+                        appUri: 'linkedin://',
+                        androidAppId: 'com.linkedin.android',
+                        iOsAppStore:'https://itunes.apple.com/us/app/linkedin/id288429040?mt=8',
+                        debug:false // Optional
+                        //campaignCode: 'this-is-test-campaign' // optional, this appends campaign on app store url.
+                    });
+                }, 2000);
       </script>
   </body>
 </html>

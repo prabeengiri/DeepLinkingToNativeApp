@@ -22,7 +22,7 @@ export class CTAAppLaunchStrategy {
     body.addEventListener('click', (ev: Event) => {
       const el = ev.target as HTMLElement;
       if (id) {
-        if (el.matches(id)) {
+        if (el.matches(`#${id}`)) {
           ev.preventDefault()
           directStrategy.init();
         }

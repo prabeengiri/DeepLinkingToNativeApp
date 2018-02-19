@@ -45,11 +45,11 @@ export function AppLaunchStrategyFactory(strategyType: StrategyEnum, settings: a
 export function AppLaunchStrategyParameterFactory(settings: any) {
   let strategyParameters = new AppLaunchStrategyParameters(settings);
   // let parameterType;
-
-  if (BrowserChecker().isIOS) {
+  const browserChecker = BrowserChecker();
+  if (browserChecker.isIOS) {
     // parameterType = 'ios';
     strategyParameters = new IOSAppLaunchStrategyParameters(settings);
-  } else if (BrowserChecker().isAndroid) {
+  } else if (browserChecker.isAndroid) {
     // parameterType = 'android';
     strategyParameters = new AndroidAppLaunchStrategyParameters(settings);
   } else {

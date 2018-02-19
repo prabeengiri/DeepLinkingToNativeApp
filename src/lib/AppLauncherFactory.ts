@@ -1,5 +1,11 @@
 import { BrowserChecker } from './BrowserChecker';
 import { AppLaunchStrategyFactory, StrategyEnum } from './AppLaunchStrategyFactory';
+import { CTAAppLaunchStrategy } from './CTAAppLaunchStrategy';
+import { DirectAppLaunchStrategy } from './DirectAppLaunchStrategy';
+import { UniversalLinkingAppLaunchStrategy } from './UniversalLinkingAppLaunchStrategy';
+import { AppLaunchNotSupportedStrategy } from './AppLaunchNotSupportedStrategy';
+import { DirectAppOnlyLaunchStrategy } from './DirectAppOnlyLaunchStrategy';
+import { CTAIntentAppLaunchStrategy } from './CTAIntentAppLaunchStrategy';
 /**
 * This is the main factory which creates the deeplinking strategy object based
 * on the type of browser and its versions. Multiple instances of strategy will be created
@@ -9,14 +15,15 @@ import { AppLaunchStrategyFactory, StrategyEnum } from './AppLaunchStrategyFacto
 * @constructor
 */
 export class AppLauncherFactory {
+  // FIXME: make this class abstract so that it could return one of the sub strategy types
+  [x: string]: any; // just a quick fix :(
   private browser: any;
-  private deepLinkingStrategy: any;
+  private deepLinkingStrategy: CTAAppLaunchStrategy | DirectAppLaunchStrategy | UniversalLinkingAppLaunchStrategy | AppLaunchNotSupportedStrategy | DirectAppOnlyLaunchStrategy | CTAIntentAppLaunchStrategy;
 
   constructor(private settings: any) {
     this.browser = BrowserChecker();
-
-    this.assignStrategy();
-    return this.deepLinkingStrategy;
+    this.deepLinkingStrategy =  this.assignStrategy(); // just to satisfy the compiler
+    return this.deepLinkingStrategy as any;
   }
 
   private assignStrategy() {
@@ -47,6 +54,8 @@ export class AppLauncherFactory {
         this.deepLinkingStrategy = AppLaunchStrategyFactory(StrategyEnum.notsupported, this.settings);
       }
     }
+
+    return this.deepLinkingStrategy;
 
     // if (this.settings.debug == true) {
     //   __debug('browser', browser);

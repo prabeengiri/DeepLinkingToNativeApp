@@ -22,13 +22,13 @@ export class NativeAppLauncher {
       appendQueryParameter
     };
 
+    // TODO: is this true?
     // Let all the page render finish.
-    setTimeout(() => {
-      return new AppLauncherFactory(this.Settings);
-    }, 1000);
+    return new AppLauncherFactory(this.Settings).init();
   }
 }
 
+// TODO: no needed anymore probably.
 // Element.prototype.matches =
 //   Element.prototype.matches ||
 //   Element.prototype.matchesSelector ||
